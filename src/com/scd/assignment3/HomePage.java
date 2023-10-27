@@ -10,14 +10,46 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.util.ArrayList;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Abdul Ahad
  */
 public class HomePage {
-    public static void main(String[] args){
+    
+    public static void main(String[] args) throws FileNotFoundException, ParseException{
         
+        LibraryManagementSystem library = new LibraryManagementSystem();
+        library.readFromFile();
+        
+        String[] columns = {"Title", "Author", "Year", "Read"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0);
+        JTable table = new JTable(model);
+        JScrollPane scrollpane = new JScrollPane(table);
+        scrollpane.setPreferredSize(new Dimension(430, 400));
+        table.setPreferredSize(new Dimension(430, 400));
+        table.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer());
+        table.addMouseListener(new MouseAdapter(){
+            int highlightedRow = -1;
+            @Override
+            public void mouseEntered(MouseEvent e){
+                int row = table.rowAtPoint(e.getPoint());
+                if (row != highlightedRow){
+                    highlightedRow = row;
+                    table.setRowSelectionInterval(highlightedRow, highlightedRow);
+                }
+            }
+            @Override
+            public void mouseExited(MouseEvent e){
+                highlightedRow = -1;
+                table.clearSelection();
+            }
+        });
         
         JFrame home = new JFrame("Home");
         home.getContentPane().setBackground(new Color(37, 118, 133));
@@ -37,7 +69,7 @@ public class HomePage {
         rightPanel.add(new Label("Library Management System"));
         rightPanel.setBackground(Colors.getBackgroundColor2());
         rightPanel.setPreferredSize(new Dimension(450, rightPanel.getPreferredSize().height));
-        
+        rightPanel.add(scrollpane);
 
         
         container.add(leftPanel);
@@ -85,13 +117,12 @@ public class HomePage {
                 addButton.setFont(Fonts.getFont2());
             }
             @Override
-            public void mouseClicked(MouseEvent e){
-                JFrame frame = new JFrame("Frame");
-                frame.setVisible(true);
-                frame.setSize(500,500);
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            public void mousePressed(MouseEvent e){
+                rightPanel.remove(scrollpane);
             }
         });
+        
+        
         
         JPanel option2 = new JPanel();
         option2.setLayout(new BorderLayout());
@@ -102,6 +133,33 @@ public class HomePage {
         viewButton.setForeground(Color.WHITE);
         viewButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         option2.add(viewButton, BorderLayout.WEST);
+        option2.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e){
+                option2.setBackground(Colors.getBackgroundColor3());
+                viewButton.setBackground(Colors.getBackgroundColor3());
+                viewButton.setFont(Fonts.getFont1());
+            }
+            @Override
+            public void mouseExited(MouseEvent e){
+                option2.setBackground(Colors.getBackgroundColor1());
+                viewButton.setBackground(Colors.getBackgroundColor1());
+                viewButton.setFont(Fonts.getFont2());
+            }
+            @Override
+            public void mousePressed(MouseEvent e){
+
+                ArrayList<Book> books = new ArrayList<>(library.displayAllItems());
+                for (Book book: books){
+                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(), new JButton("Read")};
+                    model.addRow(row);
+                }
+                
+                
+            }
+        });
+        
+        
         JPanel option3 = new JPanel();
         option3.setLayout(new BorderLayout());
         option3.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -111,6 +169,17 @@ public class HomePage {
         viewPopularity.setForeground(Colors.getForegroundColor1());
         viewPopularity.setAlignmentX(Component.LEFT_ALIGNMENT);
         option3.add(viewPopularity);
+        
+        JPanel option4 = new JPanel();
+        option4.setLayout(new BorderLayout());
+        option4.setAlignmentX(0);
+        option4.setBackground(Colors.getBackgroundColor1());
+        option4.setForeground(Colors.getForegroundColor1());
+        JLabel deleteButton = new JLabel("Delete Book");
+        deleteButton.setBackground(Colors.getBackgroundColor1());
+        deleteButton.setForeground(Colors.getForegroundColor1());
+        deleteButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        option4.add(deleteButton);
         
         
         menu.add(option1);
@@ -158,3 +227,4 @@ public class HomePage {
        
     }
 }
+

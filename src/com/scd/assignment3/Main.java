@@ -98,6 +98,19 @@ public class Main {
         JButton viewbutton = new JButton("View");
         
         
+        Image image = new ImageIcon("Book.png").getImage();
+        image = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(image);
+        JLabel imageicon = new JLabel(icon);
+        JLabel name = new JLabel("Image");
+        JPanel images = new JPanel();
+        images.setLayout(new BoxLayout(images, BoxLayout.X_AXIS));
+        images.add(imageicon);
+        images.add(name);
+        
+        homePage.add(images);
+        
+        
 //        addbutton.setBounds(550, 600, 150, 20);
 //        deletebutton.setBounds(550, 700, 150, 20);
 //        viewbutton.setBounds(550, 800, 150, 20);
