@@ -7,6 +7,8 @@ package com.scd.assignment3;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
@@ -18,12 +20,15 @@ import javax.swing.table.TableCellRenderer;
 public class ButtonRenderer implements TableCellRenderer {
     private JButton button;
 
-    public ButtonRenderer() {
+    public ButtonRenderer(JTable table) {
         button = new JButton("Read");
         button.setFocusPainted(false);
-        button.addActionListener(new ActionListener() {
+        button.addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
+                int row = table.getSelectedRow();
+                String v = table.getValueAt(row, 0).toString();
+                System.out.println("Value: " + v);
             }
         });
     }

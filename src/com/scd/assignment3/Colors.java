@@ -13,7 +13,7 @@ import java.awt.Color;
 public class Colors {
     
     static public Color getBackgroundColor1(){
-        return Color.BLACK;
+        return new Color(54, 33, 89) ;
     }
     
     static public Color getForegroundColor1(){
@@ -21,10 +21,10 @@ public class Colors {
     }
     
     static public Color getBackgroundColor2(){
-        return new Color(12, 229, 241);
+        return Color.WHITE;
     }
     
     static public Color getBackgroundColor3(){
-        return Color.RED;
+        return new Color(85, 65, 118);
     }
 }

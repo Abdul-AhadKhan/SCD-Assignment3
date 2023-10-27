@@ -8,24 +8,30 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
 /**
  *
  * @author Abdul Ahad
  */
 public class HomePage {
     
+    static private ArrayList<Book> books = new ArrayList<>();
+    
     public static void main(String[] args) throws FileNotFoundException, ParseException{
         
         LibraryManagementSystem library = new LibraryManagementSystem();
         library.readFromFile();
+        books.addAll(library.displayAllItems());
         
         String[] columns = {"Title", "Author", "Year", "Read"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
@@ -33,22 +39,22 @@ public class HomePage {
         JScrollPane scrollpane = new JScrollPane(table);
         scrollpane.setPreferredSize(new Dimension(430, 400));
         table.setPreferredSize(new Dimension(430, 400));
-        table.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer());
-        table.addMouseListener(new MouseAdapter(){
+        table.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer(table));
+        table.addMouseMotionListener(new MouseInputAdapter(){
             int highlightedRow = -1;
             @Override
-            public void mouseEntered(MouseEvent e){
+            public void mouseMoved(MouseEvent e){
                 int row = table.rowAtPoint(e.getPoint());
-                if (row != highlightedRow){
+                if (row != highlightedRow && row != -1){
+                    if (highlightedRow >= 0){
+                        table.removeRowSelectionInterval(highlightedRow, highlightedRow);
+                    }
                     highlightedRow = row;
                     table.setRowSelectionInterval(highlightedRow, highlightedRow);
                 }
+                
             }
-            @Override
-            public void mouseExited(MouseEvent e){
-                highlightedRow = -1;
-                table.clearSelection();
-            }
+
         });
         
         JFrame home = new JFrame("Home");
@@ -92,7 +98,7 @@ public class HomePage {
         
         
         JPanel option1 = new JPanel();
-        option1.setPreferredSize(new Dimension(147, 20));
+        option1.setPreferredSize(new Dimension(147, 30));
         option1.setLayout(new BorderLayout());
         option1.setBackground(Colors.getBackgroundColor1());
         option1.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -126,6 +132,7 @@ public class HomePage {
         
         JPanel option2 = new JPanel();
         option2.setLayout(new BorderLayout());
+        option2.setPreferredSize(new Dimension(147, 30));
         option2.setBackground(Colors.getBackgroundColor1());
         option2.setAlignmentX(Component.LEFT_ALIGNMENT);
         JLabel viewButton = new JLabel("- View Books");
@@ -149,9 +156,10 @@ public class HomePage {
             @Override
             public void mousePressed(MouseEvent e){
 
+                ButtonRenderer b = new ButtonRenderer(table);
                 ArrayList<Book> books = new ArrayList<>(library.displayAllItems());
                 for (Book book: books){
-                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(), new JButton("Read")};
+                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(), b.getTableCellRendererComponent(table, e, true, true, 0, 0)};
                     model.addRow(row);
                 }
                 
@@ -162,6 +170,7 @@ public class HomePage {
         
         JPanel option3 = new JPanel();
         option3.setLayout(new BorderLayout());
+        option3.setPreferredSize(new Dimension(147, 30));
         option3.setAlignmentX(Component.LEFT_ALIGNMENT);
         option3.setBackground(Colors.getBackgroundColor1());
         JLabel viewPopularity = new JLabel("- Popularity");
@@ -169,6 +178,32 @@ public class HomePage {
         viewPopularity.setForeground(Colors.getForegroundColor1());
         viewPopularity.setAlignmentX(Component.LEFT_ALIGNMENT);
         option3.add(viewPopularity);
+        option3.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseEntered(MouseEvent e){
+                option3.setBackground(Colors.getBackgroundColor3());
+                viewPopularity.setBackground(Colors.getBackgroundColor3());
+                viewPopularity.setFont(Fonts.getFont1());
+            }
+            @Override
+            public void mouseExited(MouseEvent e){
+                option3.setBackground(Colors.getBackgroundColor1());
+                viewPopularity.setBackground(Colors.getBackgroundColor1());
+                viewPopularity.setFont(Fonts.getFont2());
+            }
+            @Override
+            public void mouseClicked(MouseEvent e){
+                DefaultPieDataset dataset = new DefaultPieDataset();
+                for (Book book: books){
+                    dataset.setValue(book.getTitle(), book.getPopularityCount());
+                }
+                JFreeChart pieChart = ChartFactory.createPieChart3D("Pie Chart", dataset, true, true, false);
+                PiePlot pieplot = (PiePlot) pieChart.getPlot();
+                ChartPanel chartpanel = new ChartPanel(pieChart);
+                chartpanel.validate();
+                
+            }
+        });
         
         JPanel option4 = new JPanel();
         option4.setLayout(new BorderLayout());
