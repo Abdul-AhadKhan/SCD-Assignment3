@@ -201,6 +201,7 @@ public class HomePage {
                 PiePlot pieplot = (PiePlot) pieChart.getPlot();
                 ChartPanel chartpanel = new ChartPanel(pieChart);
                 chartpanel.validate();
+                rightPanel.add(chartpanel);
                 
             }
         });
