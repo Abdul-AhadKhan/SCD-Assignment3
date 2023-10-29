@@ -10,10 +10,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.border.LineBorder;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.DefaultTableModel;
@@ -137,7 +142,7 @@ public class HomePage {
             @Override
             public void mouseClicked(MouseEvent e){
                 JFrame deleteFrame = new JFrame("Delete Book");
-                deleteFrame.setSize(200, 200);
+                deleteFrame.setSize(200, 100);
                 deleteFrame.setLayout(new FlowLayout());
                 JLabel id = new JLabel("Book ID: ");
                 JTextField idField = new JTextField(5);
@@ -167,7 +172,67 @@ public class HomePage {
                 
             }
         });
-        
+        edit.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                JFrame editFrame = new JFrame("Delete Book");
+                editFrame.setSize(250, 300);
+                editFrame.setLayout(new FlowLayout());
+                JLabel id = new JLabel("Book ID: ");
+                JTextField idField = new JTextField(5);
+                JButton get = new JButton("Get Book");
+                JLabel label1 = new JLabel("Title");
+                JLabel label2 = new JLabel("Author");
+                JLabel label3 = new JLabel("Year");
+                JTextField namefield = new JTextField(20);
+                JTextField authorfield = new JTextField(20);
+                JTextField yearfield = new JTextField(20);
+                
+                get.addMouseListener(new MouseAdapter(){
+                    @Override
+                    public void mouseClicked(MouseEvent e){
+                        Book b = library.returnItem(Integer.parseInt(idField.getText()));
+
+                        namefield.setText(b.getTitle());
+                        authorfield.setText(b.getAuthor());
+                        yearfield.setText(String.valueOf(b.getYear()));
+                    }
+                });
+                JButton edit = new JButton("Edit");
+                editFrame.add(id);
+                editFrame.add(idField);
+                editFrame.add(get);
+                editFrame.add(label1);
+                editFrame.add(namefield);
+                editFrame.add(label2);
+                editFrame.add(authorfield);
+                editFrame.add(label3);
+                editFrame.add(yearfield);
+                editFrame.add(edit);
+                editFrame.setVisible(true);
+                editFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                edit.addMouseListener(new MouseAdapter(){
+                    @Override
+                    public void mouseClicked(MouseEvent e){
+                        try {
+                            library.editItem(Integer.parseInt(idField.getText()), namefield.getText(), 
+                                    authorfield.getText(), Integer.parseInt(yearfield.getText()));
+                            
+                            model.getDataVector().removeAllElements();
+                            for (Book book: library.displayAllItems()){
+                                Object[] row = {book.getId(), book.getTitle(), book.getYear(), book.getAuthor(), book.getId()};
+                                model.addRow(row);
+                                home.revalidate();
+                                home.repaint();
+                            }
+                            editFrame.dispose();
+                        } catch (ParseException ex) {
+                            Logger.getLogger(HomePage.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
+            }
+        });
         rightPanel.add(buttonPanel);
 
         
@@ -326,8 +391,9 @@ public class HomePage {
             @Override
             public void mouseClicked(MouseEvent e){
                 DefaultPieDataset dataset = new DefaultPieDataset();
-                for (Book book: books){
+                for (Book book: library.displayAllItems()){
                     dataset.setValue(book.getTitle(), book.getPopularityCount());
+                    System.out.println("Popularity Count: "  + book.getPopularityCount());
                 }
                 JFreeChart pieChart = ChartFactory.createPieChart3D("Pie Chart", dataset, true, true, false);
                 PiePlot pieplot = (PiePlot) pieChart.getPlot();
@@ -363,7 +429,18 @@ public class HomePage {
         menu.add(Box.createVerticalStrut(20));
         menu.add(option3);
         leftPanel.add(menu);
-
+        
+        home.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e){
+                try {
+                    library.saveInFile();
+                } catch (IOException ex) {
+                    Logger.getLogger(HomePage.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        });
         
        
     }

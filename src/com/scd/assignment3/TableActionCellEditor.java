@@ -5,6 +5,10 @@
 package com.scd.assignment3;
 
 import java.awt.Component;
+import java.io.FileNotFoundException;
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultCellEditor;
 import javax.swing.*;
 
@@ -21,7 +25,14 @@ public class TableActionCellEditor extends DefaultCellEditor{
     
     @Override
     public Component getTableCellEditorComponent(JTable jtable, Object o, boolean bln, int row, int col){
-        ReadButton b = new ReadButton();
+        ReadButton b = null;
+        try {
+            b = new ReadButton();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TableActionCellEditor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(TableActionCellEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         String name = jtable.getValueAt(row, 1).toString();
         int id = Integer.parseInt(jtable.getValueAt(row, 0).toString());
         b.setRow(row, name, id);

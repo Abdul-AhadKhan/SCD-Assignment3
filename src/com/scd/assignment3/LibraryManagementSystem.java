@@ -6,6 +6,8 @@ package com.scd.assignment3;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +19,7 @@ import java.util.Scanner;
  */
 public class LibraryManagementSystem {
         
-    ArrayList<Book> ItemsList = new ArrayList<>();
+    static ArrayList<Book> ItemsList = new ArrayList<>();
     
     public void readFromFile() throws FileNotFoundException, ParseException
     {
@@ -73,13 +75,21 @@ public class LibraryManagementSystem {
         
         for (int i = 0; i < ItemsList.size(); i++){
             if (ItemsList.get(i).getId() == itemId){
-                ItemsList.get(i).editItem();
                 ItemsList.get(i).setTitle(title);
                 ItemsList.get(i).setAuthor(author);
                 ItemsList.get(i).setYear(year);
                 return;
             }
         } 
+    }
+    
+    public void increment(int itemId){
+        
+        for (int i = 0; i < ItemsList.size(); i++){
+            if (ItemsList.get(i).getId() == itemId){
+                ItemsList.get(i).setPopularityCount(ItemsList.get(i).getPopularityCount() + 1);
+            }
+        }
     }
     
     public Book returnItem(int id){
@@ -118,7 +128,19 @@ public class LibraryManagementSystem {
     }
     
 
-    
+    public void saveInFile() throws IOException{
+        FileWriter f = new FileWriter("Books.txt");
+        for (int i = 0; i < ItemsList.size();){
+            f.write(ItemsList.get(i).getTitle() + ", " + ItemsList.get(i).getAuthor() + ", "
+            + ItemsList.get(i).getYear() + ", " + ItemsList.get(i).getPopularityCount());
+            i++;
+            if (i < ItemsList.size()){
+                f.write("\n");
+            }
+        }
+        f.close();
+        System.out.println("File Saved");
+    }
 
 
 }

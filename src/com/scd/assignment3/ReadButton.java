@@ -9,9 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -26,8 +28,9 @@ public class ReadButton {
     int row;
     String bookTitle;
     int id;
-    ReadButton(){
+    ReadButton() throws FileNotFoundException, ParseException{
         read = new JButton("Read");
+
         read.addActionListener(new ActionListener(){
             
             @Override
@@ -40,6 +43,15 @@ public class ReadButton {
                     String fileData = Files.readString(p);
                     data.setText(fileData);
                     data.setEditable(false);
+                    LibraryManagementSystem library = new LibraryManagementSystem();
+                    try {
+                        library.readFromFile();
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    library.increment(id);
                     
                 } catch (IOException ex) {
                     Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
