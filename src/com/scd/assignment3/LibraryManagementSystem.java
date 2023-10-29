@@ -49,31 +49,9 @@ public class LibraryManagementSystem {
         System.out.println("Items Loaded From File");
     }
     
-    public void addItem() throws ParseException{
+    public void addItem(Book b){
         
-        int type = 0, year = 0;
-        String title, author, publisher, d;
-        Date date;
-        float price;
-        ArrayList<String> authorsList = new ArrayList<>();
-        
-        Scanner sc = new Scanner(System.in);
-        System.out.println("1. Book");
-        System.out.println("2. Magazine");
-        System.out.println("3. Newspaper");
-        System.out.print("Enter Which Item you want to add: ");
-        type = sc.nextInt();
-        sc.nextLine();
-        
-        System.out.print("Enter the title of the book: ");
-        title = sc.nextLine().trim();
-        System.out.print("Enter the author of the book: ");
-        author = sc.nextLine().trim();
-        System.out.print("Enter the year of publication: ");
-        year = sc.nextInt();
-        ItemsList.add(new Book(title, author, year, 0));
-        System.out.println("Item added Successfully");
-        
+        ItemsList.add(b);
         
     }
     

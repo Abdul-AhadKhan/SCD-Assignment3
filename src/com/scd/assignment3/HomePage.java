@@ -6,14 +6,18 @@ package com.scd.assignment3;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.border.LineBorder;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -33,6 +37,9 @@ public class HomePage {
         library.readFromFile();
         books.addAll(library.displayAllItems());
         
+        JFrame home = new JFrame("Home");
+
+        
         String[] columns = {"Title", "Author", "Year", "Read"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable table = new JTable(model);
@@ -40,7 +47,8 @@ public class HomePage {
         scrollpane.setPreferredSize(new Dimension(430, 400));
         table.setPreferredSize(new Dimension(430, 400));
         table.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer(table));
-        table.addMouseMotionListener(new MouseInputAdapter(){
+        table.getColumnModel().getColumn(3).setCellEditor(new TableActionCellEditor());
+        table.addMouseMotionListener(new MouseAdapter(){
             int highlightedRow = -1;
             @Override
             public void mouseMoved(MouseEvent e){
@@ -54,28 +62,88 @@ public class HomePage {
                 }
                 
             }
+            
+            @Override
+            public void mouseClicked(MouseEvent e){
+                int row = table.rowAtPoint(e.getPoint());
+                
+                JLabel label1 = new JLabel("Title");
+                JLabel label2 = new JLabel("Author");
+                JLabel label3 = new JLabel("Year");
+                JTextField field1 = new JTextField(10);
+                field1.setText(table.getValueAt(row, 0).toString());
+                JTextField field2 = new JTextField(10);
+                field2.setText(table.getValueAt(row, 1).toString());
+                JTextField field3 = new JTextField(10);
+                field3.setText(table.getValueAt(row, 2).toString());
+                
+                JPanel panel = new JPanel();
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                
+                JPanel panel1 = new JPanel();
+                panel1.setLayout(new FlowLayout());
+                panel1.add(label1);
+                panel1.add(field1);
+                JPanel panel2 = new JPanel();
+                panel2.setLayout(new FlowLayout());
+                panel2.add(label2);
+                panel2.add(field2);
+                JPanel panel3 = new JPanel();
+                panel3.setLayout(new FlowLayout());
+                panel3.add(label3);
+                panel3.add(field3);
+                
+                panel.add(panel1);
+                panel.add(panel2);
+                panel.add(panel3);
+                
+                int result = JOptionPane.showConfirmDialog(home, panel, "Book Details", JOptionPane.CANCEL_OPTION);
+                
+                if (result == JOptionPane.CANCEL_OPTION){
+                    System.out.println("OK");
+                }
+            }
 
         });
         
-        JFrame home = new JFrame("Home");
+        
         home.getContentPane().setBackground(new Color(37, 118, 133));
         home.setVisible(true);
-        home.setSize(600, 500);
+        home.setSize(600, 540);
         home.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         Box container = Box.createHorizontalBox();
         
         JPanel leftPanel = new JPanel();
         leftPanel.setBackground(Colors.getBackgroundColor1());
-        leftPanel.setPreferredSize(new Dimension(150, leftPanel.getPreferredSize().height));
+        leftPanel.setPreferredSize(new Dimension(140, leftPanel.getPreferredSize().height));
         LineBorder border = new LineBorder(Color.WHITE, 3);
         leftPanel.setBorder(border);
         
         JPanel rightPanel = new JPanel();
         rightPanel.add(new Label("Library Management System"));
         rightPanel.setBackground(Colors.getBackgroundColor2());
-        rightPanel.setPreferredSize(new Dimension(450, rightPanel.getPreferredSize().height));
+        rightPanel.setPreferredSize(new Dimension(460, 300));
         rightPanel.add(scrollpane);
+        
+        JPanel buttonPanel = new JPanel();
+        JButton edit = new JButton("Edit");
+        JButton delete = new JButton("Delete");
+        buttonPanel.add(edit);
+        buttonPanel.add(delete);
+        delete.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+                int row = table.getSelectedRow();
+                
+                System.out.println(row);
+                int id = Integer.parseInt(model.getValueAt(row, 4).toString());
+                System.out.println(id);
+                model.removeRow(row);
+                //library.deleteItem(id);
+            }
+        });
+        rightPanel.add(buttonPanel);
 
         
         container.add(leftPanel);
@@ -123,8 +191,47 @@ public class HomePage {
                 addButton.setFont(Fonts.getFont2());
             }
             @Override
-            public void mousePressed(MouseEvent e){
-                rightPanel.remove(scrollpane);
+            public void mouseClicked(MouseEvent e){
+                
+                JPanel InputPanel = new JPanel();
+                InputPanel.setLayout(new BoxLayout(InputPanel, BoxLayout.Y_AXIS));
+                
+                JPanel namePanel = new JPanel();
+                namePanel.setLayout(new FlowLayout());
+                JLabel title = new JLabel("Title: ");
+                JTextField field1 = new JTextField(15);
+                namePanel.add(title);
+                namePanel.add(field1);
+                
+                JPanel authorPanel = new JPanel();
+                authorPanel.setLayout(new FlowLayout());
+                JLabel author = new JLabel("Author: ");
+                JTextField field2 = new JTextField(15);
+                authorPanel.add(author);
+                authorPanel.add(field2);
+                
+                JPanel yearPanel = new JPanel();
+                yearPanel.setLayout(new FlowLayout());
+                JLabel year = new JLabel("Year: ");
+                JTextField field3 = new JTextField(15);
+                yearPanel.add(year);
+                yearPanel.add(field3);
+                
+                InputPanel.add(namePanel);
+                InputPanel.add(authorPanel);
+                InputPanel.add(yearPanel);
+                
+                int result = JOptionPane.showConfirmDialog(home, InputPanel,"Input Dialog", JOptionPane.OK_OPTION);
+                
+                if (result == JOptionPane.OK_OPTION){
+                    Book b = new Book((String)field1.getText(),(String)field2.getText(), Integer.parseInt((String)field3.getText()));
+                    library.addItem(b);
+                    Object[] row = {b.getTitle(), b.getYear(), b.getAuthor()};
+                    model.setValueAt(b.getId(), model.getRowCount() - 1, model.getColumnCount());
+                    model.addRow(row);
+                    home.revalidate();
+                    home.repaint();
+                }
             }
         });
         
@@ -159,7 +266,7 @@ public class HomePage {
                 ButtonRenderer b = new ButtonRenderer(table);
                 ArrayList<Book> books = new ArrayList<>(library.displayAllItems());
                 for (Book book: books){
-                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(), b.getTableCellRendererComponent(table, e, true, true, 0, 0)};
+                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(), b.getTableCellRendererComponent(table, e, true, true, 0, 0), book.getId()};
                     model.addRow(row);
                 }
                 
@@ -201,7 +308,14 @@ public class HomePage {
                 PiePlot pieplot = (PiePlot) pieChart.getPlot();
                 ChartPanel chartpanel = new ChartPanel(pieChart);
                 chartpanel.validate();
-                rightPanel.add(chartpanel);
+                
+                JFrame pieFrame = new JFrame("Pie Chart");
+                pieFrame.setSize(800, 500);
+                pieFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                pieFrame.setVisible(true);
+                JPanel panel = new JPanel();
+                panel.add(chartpanel);
+                pieFrame.add(panel);
                 
             }
         });
@@ -225,41 +339,7 @@ public class HomePage {
         menu.add(option3);
         leftPanel.add(menu);
 
-
-       
-//        JLabel title = new JLabel("Library Management System");
-//        title.setOpaque(true);
-//        title.setFont(new Font(Font.SANS_SERIF, Font.ITALIC, 20));
-//        title.setForeground(Color.red);
-//        JPanel titlePanel = new JPanel();
-//        titlePanel.add(title);
-//        titlePanel.setOpaque(true);
-//        
-//        home.add(titlePanel, BorderLayout.NORTH);
-//        
-//        JPanel optionsPanel = new JPanel();
-//        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-//        JButton addButton = new JButton("Add Item");
-//        addButton.setSize(20, 30);
-//        addButton.setAlignmentX(JFrame.CENTER_ALIGNMENT);
-//        JButton deleteButton = new JButton("Delete Item");
-//        deleteButton.setAlignmentX(JFrame.CENTER_ALIGNMENT);
-//        JButton viewButton = new JButton("View Items");
-//        viewButton.setBounds(0, 0, 20, 30);
-//        JButton borrowItem = new JButton("Borrow Item");
-//        borrowItem.setBounds(0, 0, 20, 30);
-//        JButton viewBorrowedItems = new JButton("View Borrowed Items");
-//        optionsPanel.add(addButton);
-//        optionsPanel.add(deleteButton);
-//        optionsPanel.add(deleteButton);
-//        optionsPanel.add(viewButton);
-//        optionsPanel.add(borrowItem);
-//        optionsPanel.add(viewBorrowedItems);
-//        optionsPanel.setOpaque(true);
-//        optionsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-//       
-//        
-//        home.add(optionsPanel, BorderLayout.CENTER);
+        
        
     }
 }

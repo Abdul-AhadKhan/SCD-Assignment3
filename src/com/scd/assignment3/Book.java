@@ -29,6 +29,14 @@ public class Book{
         popularityCount = pCount;
     }
     
+    Book (String t, String a, int y){
+        title = t;
+        id = nextId++;
+        author = a;
+        year = y;
+        popularityCount = 0;
+    }
+    
 
     
     public void editItem(){
