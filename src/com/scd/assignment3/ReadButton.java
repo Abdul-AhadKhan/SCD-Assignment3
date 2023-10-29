@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,40 +40,41 @@ public class ReadButton {
                 JTextArea data = new JTextArea();
                 
                 Path p = Path.of(bookTitle + ".txt");
-                try {
-                    String fileData = Files.readString(p);
-                    data.setText(fileData);
-                    data.setEditable(false);
-                    LibraryManagementSystem library = new LibraryManagementSystem();
+                File f = new File(bookTitle + ".txt");
+                if (f.isFile()){
                     try {
-                        library.readFromFile();
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ParseException ex) {
-                        Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    library.increment(id);
-                    
-                } catch (IOException ex) {
-                    Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                JScrollPane scrollpane = new JScrollPane(data);
-                bookContent.add(scrollpane);
-                bookContent.setSize(400, 400);
-                bookContent.setVisible(true);
-                bookContent.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                bookContent.addWindowListener(new WindowAdapter(){
-                    @Override
-                    public void windowClosing(WindowEvent e){
-                        int result = JOptionPane.showConfirmDialog(bookContent, "Are you sure you want to close this window?",
-                                "Close Window?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                        
-                        if (result == JOptionPane.YES_OPTION){
-                            bookContent.dispose();
-                        }
+                        String fileData = Files.readString(p);
+                        data.setText(fileData);
+                        data.setEditable(false);
+                        LibraryManagementSystem library = new LibraryManagementSystem();
+                        library.increment(id);
 
+                    } catch (IOException ex) {
+                        Logger.getLogger(ReadButton.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                });
+                
+                    JScrollPane scrollpane = new JScrollPane(data);
+                    bookContent.add(scrollpane);
+                    bookContent.setSize(400, 400);
+                    bookContent.setVisible(true);
+                    bookContent.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                    bookContent.addWindowListener(new WindowAdapter(){
+                        @Override
+                        public void windowClosing(WindowEvent e){
+                            int result = JOptionPane.showConfirmDialog(bookContent, "Are you sure you want to close this window?",
+                                    "Close Window?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+
+                            if (result == JOptionPane.YES_OPTION){
+                                bookContent.dispose();
+                            }
+
+                        }
+                    });
+                }
+                else{
+                    JOptionPane.showConfirmDialog(bookContent, "File Does Not Exists?",
+                                    "No File?", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
     }

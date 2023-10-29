@@ -13,7 +13,7 @@ import java.awt.Font;
 public class Fonts {
     
     static public Font getFont1(){
-        return new Font(Font.SANS_SERIF, Font.BOLD, 15);
+        return new Font(Font.SANS_SERIF, Font.BOLD, 12);
     }
     
     static public Font getFont2(){
