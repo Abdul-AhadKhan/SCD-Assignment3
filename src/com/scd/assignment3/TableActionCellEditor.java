@@ -14,17 +14,17 @@ import javax.swing.*;
  */
 public class TableActionCellEditor extends DefaultCellEditor{
     
-    private JButton button;
     
     public TableActionCellEditor(){
         super(new JCheckBox());
-        button = new JButton("Read");
-        button.setFocusPainted(false);
     }
     
     @Override
     public Component getTableCellEditorComponent(JTable jtable, Object o, boolean bln, int row, int col){
-        return button;
+        ReadButton b = new ReadButton();
+        String name = jtable.getValueAt(row, 0).toString();
+        b.setRow(row, name);
+        return b.returnButton();
     }
     
 }

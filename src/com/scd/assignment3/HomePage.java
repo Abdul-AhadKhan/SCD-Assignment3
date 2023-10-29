@@ -46,7 +46,7 @@ public class HomePage {
         JScrollPane scrollpane = new JScrollPane(table);
         scrollpane.setPreferredSize(new Dimension(430, 400));
         table.setPreferredSize(new Dimension(430, 400));
-        table.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer(table));
+        table.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer());
         table.getColumnModel().getColumn(3).setCellEditor(new TableActionCellEditor());
         table.addMouseMotionListener(new MouseAdapter(){
             int highlightedRow = -1;
@@ -263,10 +263,10 @@ public class HomePage {
             @Override
             public void mousePressed(MouseEvent e){
 
-                ButtonRenderer b = new ButtonRenderer(table);
+                //ButtonRenderer b = new ButtonRenderer(table);
                 ArrayList<Book> books = new ArrayList<>(library.displayAllItems());
                 for (Book book: books){
-                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(), b.getTableCellRendererComponent(table, e, true, true, 0, 0), book.getId()};
+                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(),  book.getId()};
                     model.addRow(row);
                 }
                 
