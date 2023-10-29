@@ -7,6 +7,8 @@ package com.scd.assignment3;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +25,7 @@ public class ReadButton {
     JButton read;
     int row;
     String bookTitle;
+    int id;
     ReadButton(){
         read = new JButton("Read");
         read.addActionListener(new ActionListener(){
@@ -44,15 +47,28 @@ public class ReadButton {
                 JScrollPane scrollpane = new JScrollPane(data);
                 bookContent.add(scrollpane);
                 bookContent.setSize(400, 400);
-                bookContent.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 bookContent.setVisible(true);
+                bookContent.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                bookContent.addWindowListener(new WindowAdapter(){
+                    @Override
+                    public void windowClosing(WindowEvent e){
+                        int result = JOptionPane.showConfirmDialog(bookContent, "Are you sure you want to close this window?",
+                                "Close Window?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        
+                        if (result == JOptionPane.YES_OPTION){
+                            bookContent.dispose();
+                        }
+
+                    }
+                });
             }
         });
     }
     
-    public void setRow(int r, String n){
+    public void setRow(int r, String n, int id){
         row = r;
         bookTitle = n;
+        this.id = id;
     }
     public Component returnButton(){
         return read;

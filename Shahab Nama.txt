@@ -69,29 +69,17 @@ public class LibraryManagementSystem {
         System.out.println("Item Not Found");
     }
     
-    public void editItem(int itemId, String title, String author, int year) throws ParseException{
+    public void editItem(int itemId) throws ParseException{
         
         for (int i = 0; i < ItemsList.size(); i++){
             if (ItemsList.get(i).getId() == itemId){
+                System.out.println("Previous Information:- ");
                 ItemsList.get(i).editItem();
-                ItemsList.get(i).setTitle(title);
-                ItemsList.get(i).setAuthor(author);
-                ItemsList.get(i).setYear(year);
-                return;
+                System.out.println("Item Updated Successfully");
             }
         } 
     }
     
-    public Book returnItem(int id){
-        Book b = null;
-        for (int i = 0; i < ItemsList.size(); i++){
-            if (id == ItemsList.get(i).getId()){
-                b = ItemsList.get(i);
-                break;
-            }
-        }
-        return b;
-    }
     
     public ArrayList<Book> displayAllItems(){
         return ItemsList;

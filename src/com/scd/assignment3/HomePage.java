@@ -40,20 +40,20 @@ public class HomePage {
         JFrame home = new JFrame("Home");
 
         
-        String[] columns = {"Title", "Author", "Year", "Read"};
+        String[] columns = {"ID", "Title", "Author", "Year", "Read"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         JTable table = new JTable(model);
         JScrollPane scrollpane = new JScrollPane(table);
         scrollpane.setPreferredSize(new Dimension(430, 400));
         table.setPreferredSize(new Dimension(430, 400));
-        table.getColumnModel().getColumn(3).setCellRenderer(new ButtonRenderer());
-        table.getColumnModel().getColumn(3).setCellEditor(new TableActionCellEditor());
+        table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
+        table.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor());
         table.addMouseMotionListener(new MouseAdapter(){
             int highlightedRow = -1;
             @Override
             public void mouseMoved(MouseEvent e){
                 int row = table.rowAtPoint(e.getPoint());
-                if (row != highlightedRow && row != -1){
+                if (row != highlightedRow && row >= 0){
                     if (highlightedRow >= 0){
                         table.removeRowSelectionInterval(highlightedRow, highlightedRow);
                     }
@@ -103,6 +103,8 @@ public class HomePage {
                     System.out.println("OK");
                 }
             }
+            
+  
 
         });
         
@@ -134,15 +136,38 @@ public class HomePage {
         delete.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e){
-                int row = table.getSelectedRow();
+                JFrame deleteFrame = new JFrame("Delete Book");
+                deleteFrame.setSize(200, 200);
+                deleteFrame.setLayout(new FlowLayout());
+                JLabel id = new JLabel("Book ID: ");
+                JTextField idField = new JTextField(5);
+                JButton delete = new JButton("Delete");
+                deleteFrame.add(id);
+                deleteFrame.add(idField);
+                deleteFrame.add(delete);
+                delete.addMouseListener(new MouseAdapter(){
+                    @Override
+                    public void mouseClicked(MouseEvent e){
+                        int id = Integer.parseInt(idField.getText());
+                        library.deleteItem(id);
+                        model.getDataVector().removeAllElements();
+                        for (Book book: library.displayAllItems()){
+                            Object[] row = {book.getId(), book.getTitle(), book.getYear(), book.getAuthor(), book.getId()};
+                            model.addRow(row);
+                            home.revalidate();
+                            home.repaint();
+                        }
+                        deleteFrame.dispose();
+                    }
+                    
+                });
+                deleteFrame.setVisible(true);
                 
-                System.out.println(row);
-                int id = Integer.parseInt(model.getValueAt(row, 4).toString());
-                System.out.println(id);
-                model.removeRow(row);
-                //library.deleteItem(id);
+                deleteFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                
             }
         });
+        
         rightPanel.add(buttonPanel);
 
         
@@ -226,8 +251,8 @@ public class HomePage {
                 if (result == JOptionPane.OK_OPTION){
                     Book b = new Book((String)field1.getText(),(String)field2.getText(), Integer.parseInt((String)field3.getText()));
                     library.addItem(b);
-                    Object[] row = {b.getTitle(), b.getYear(), b.getAuthor()};
-                    model.setValueAt(b.getId(), model.getRowCount() - 1, model.getColumnCount());
+                    Object[] row = {b.getId(), b.getTitle(), b.getYear(), b.getAuthor(), b.getId()};
+                    
                     model.addRow(row);
                     home.revalidate();
                     home.repaint();
@@ -266,7 +291,7 @@ public class HomePage {
                 //ButtonRenderer b = new ButtonRenderer(table);
                 ArrayList<Book> books = new ArrayList<>(library.displayAllItems());
                 for (Book book: books){
-                    Object[] row = {book.getTitle(), book.getYear(), book.getAuthor(),  book.getId()};
+                    Object[] row = {book.getId(), book.getTitle(), book.getYear(), book.getAuthor(), book.getId()};
                     model.addRow(row);
                 }
                 

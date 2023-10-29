@@ -22,8 +22,9 @@ public class TableActionCellEditor extends DefaultCellEditor{
     @Override
     public Component getTableCellEditorComponent(JTable jtable, Object o, boolean bln, int row, int col){
         ReadButton b = new ReadButton();
-        String name = jtable.getValueAt(row, 0).toString();
-        b.setRow(row, name);
+        String name = jtable.getValueAt(row, 1).toString();
+        int id = Integer.parseInt(jtable.getValueAt(row, 0).toString());
+        b.setRow(row, name, id);
         return b.returnButton();
     }
     
