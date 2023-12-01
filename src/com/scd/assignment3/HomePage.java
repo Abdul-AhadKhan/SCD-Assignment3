@@ -112,14 +112,23 @@ public class HomePage {
                     public void mouseClicked(MouseEvent e){
                         int id = Integer.parseInt(idField.getText());
                         library.deleteItem(id);
-                        model.getDataVector().removeAllElements();
                         
-                        for (Book book: library.displayAllItems()){
-                            model.fireTableDataChanged();
-                            table.repaint();
-                            Object[] row = {book.getId(), book.getTitle(), book.getYear(), book.getAuthor()};
-                            model.addRow(row);                           
+                        System.out.println(model.getRowCount());
+                        for (int i = 0; i < model.getRowCount(); i++){
+                            model.removeRow(i);
+                            i = -1;
                         }
+                        table.removeAll();
+                        
+                        table.getColumnModel().getColumn(4).setCellRenderer(new ButtonRenderer());
+                        table.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor());
+                        table.revalidate();
+                        table.repaint();
+                        for (Book book: library.displayAllItems()){
+                            Object[] row = {book.getId(), book.getTitle(), book.getYear(), book.getAuthor()};
+                            model.addRow(row);
+                        }
+                        
                         home.revalidate();
                         home.repaint();
                         deleteFrame.dispose();
